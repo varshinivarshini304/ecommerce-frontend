@@ -4,6 +4,10 @@ const mobileMenu = document.querySelector('.mobile-menu');
 const productGrid = document.getElementById('productGrid');
 
 const apiURL = 'https://fakestoreapi.com/products?limit=8';
+const cacheKey = 'shopEaseProducts';
+const cacheExpiryKey = 'shopEaseProductsExpiry';
+const cacheTTL = 1000 * 60 * 15; // 15 minutes
+
 const fallbackProducts = [
     {
         id: 1,
@@ -110,6 +114,49 @@ function renderProducts(products) {
     initializeCartButtons();
 }
 
+function getCachedProducts() {
+    try {
+        const rawData = localStorage.getItem(cacheKey);
+        const expiry = Number(localStorage.getItem(cacheExpiryKey));
+        if (!rawData || !expiry || Date.now() > expiry) {
+            localStorage.removeItem(cacheKey);
+            localStorage.removeItem(cacheExpiryKey);
+            return null;
+        }
+        return JSON.parse(rawData);
+    } catch {
+        return null;
+    }
+}
+
+function cacheProducts(products) {
+    try {
+        localStorage.setItem(cacheKey, JSON.stringify(products));
+        localStorage.setItem(cacheExpiryKey, String(Date.now() + cacheTTL));
+    } catch {
+        // ignore storage errors
+    }
+}
+
+function showPlaceholder(message = 'Loading products...') {
+    if (!productGrid) return;
+    productGrid.innerHTML = `
+        <div class="product-card loading-card">
+            <div class="spinner"></div>
+            <p>${message}</p>
+        </div>
+    `;
+}
+
+function showErrorMessage(message) {
+    if (!productGrid) return;
+    productGrid.innerHTML = `
+        <div class="product-card error-card">
+            <p>${message}</p>
+        </div>
+    `;
+}
+
 const cartBadge = document.querySelector('.cart-badge');
 
 function initializeCartButtons() {
@@ -133,16 +180,29 @@ function initializeCartButtons() {
 
 async function loadProducts() {
     if (!productGrid) return;
+    showPlaceholder();
+    const cachedProducts = getCachedProducts();
+    if (cachedProducts) {
+        renderProducts(cachedProducts);
+    }
+
     try {
         const response = await fetch(apiURL);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const products = await response.json();
+        if (!Array.isArray(products) || products.length === 0) {
+            throw new Error('Invalid product data received');
+        }
+        cacheProducts(products);
         renderProducts(products);
     } catch (error) {
-        console.warn('Failed to fetch products, using fallback.', error);
-        renderProducts(fallbackProducts);
+        console.warn('Failed to fetch products from API.', error);
+        if (!cachedProducts) {
+            showErrorMessage('Unable to load products. Showing sample items.');
+            renderProducts(fallbackProducts);
+        }
     }
 }
 

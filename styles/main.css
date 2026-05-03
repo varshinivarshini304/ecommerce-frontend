@@ -320,6 +320,31 @@ img {
     color: var(--muted);
 }
 
+.loading-card,
+.error-card {
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    gap: 1rem;
+    text-align: center;
+}
+
+.spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba(37, 99, 235, 0.25);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .eyebrow {
     color: var(--primary);
     font-weight: 700;
