@@ -1,0 +1,12 @@
+{
+  "name": "ecommerce-frontend",
+  "version": "1.0.0",
+  "description": "Responsive e-commerce website UI development starter project.",
+  "main": "scripts/app.js",
+  "scripts": {
+    "start": "echo \"No dev server configured. Open index.html in a browser.\""
+  },
+  "keywords": ["ecommerce", "frontend", "html", "css", "javascript"],
+  "author": "",
+  "license": "MIT"
+}
