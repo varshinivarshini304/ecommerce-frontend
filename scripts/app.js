@@ -107,6 +107,28 @@ function renderProducts(products) {
     products.forEach((product) => {
         productGrid.appendChild(createProductCard(product));
     });
+    initializeCartButtons();
+}
+
+const cartBadge = document.querySelector('.cart-badge');
+
+function initializeCartButtons() {
+    if (!productGrid) return;
+    const buttons = productGrid.querySelectorAll('.add-to-cart');
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const currentCount = Number(cartBadge?.textContent || 0);
+            if (cartBadge) {
+                cartBadge.textContent = currentCount + 1;
+            }
+            button.textContent = 'Added';
+            button.disabled = true;
+            setTimeout(() => {
+                button.disabled = false;
+                button.textContent = 'Add to Cart';
+            }, 900);
+        });
+    });
 }
 
 async function loadProducts() {
