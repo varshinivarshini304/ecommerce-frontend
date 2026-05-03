@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce Frontend</title>
+    <title>Product Details | ShopEase</title>
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
     <header class="site-header">
         <div class="header-inner">
-            <a href="#" class="logo">ShopEase</a>
+            <a href="index.html" class="logo">ShopEase</a>
 
             <nav class="nav-menu" aria-label="Primary navigation">
                 <ul class="nav-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Products</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html">Products</a></li>
                     <li><a href="#">About</a></li>
                     <li><a href="#">Contact</a></li>
                     <li><a href="auth.html">Sign In</a></li>
@@ -22,14 +22,9 @@
             </nav>
 
             <div class="header-actions">
-                <form class="search-form" action="#" role="search">
-                    <label for="search" class="visually-hidden">Search products</label>
-                    <input id="search" type="search" placeholder="Search products..." />
-                    <button type="submit">Search</button>
-                </form>
                 <button class="cart-button" aria-label="View cart">
                     <span class="cart-icon">🛒</span>
-                    <span class="cart-badge">2</span>
+                    <span class="cart-badge">0</span>
                 </button>
             </div>
 
@@ -42,8 +37,8 @@
 
         <div class="mobile-menu" aria-hidden="true">
             <ul class="mobile-nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Products</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html">Products</a></li>
                 <li><a href="#">About</a></li>
                 <li><a href="#">Contact</a></li>
                 <li><a href="auth.html">Sign In</a></li>
@@ -52,28 +47,21 @@
     </header>
 
     <main>
-        <section class="hero">
-            <div class="hero-copy">
-                <p class="eyebrow">Trusted online store</p>
-                <h1>Welcome to Our Online Store</h1>
-                <p>Discover curated products, fast browsing, and a seamless shopping experience.</p>
-                <a class="primary-button" href="#">Shop Now</a>
-            </div>
-        </section>
-
-        <section class="products-section">
+        <section class="product-detail-page">
             <div class="section-header">
-                <p class="eyebrow">Featured collection</p>
-                <h2>Shop our best sellers</h2>
+                <p class="eyebrow">Product details</p>
+                <h2>Explore this item</h2>
             </div>
-            <div class="product-grid" id="productGrid">
-                <div class="product-card placeholder-card">
-                    <p>Loading products...</p>
+
+            <div class="product-detail-grid" id="detailPlaceholder">
+                <div class="product-card loading-card">
+                    <div class="spinner"></div>
+                    <p>Loading product details...</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <script src="scripts/app.js"></script>
+    <script src="scripts/product.js"></script>
 </body>
 </html>
