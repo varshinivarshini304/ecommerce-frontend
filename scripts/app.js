@@ -8,6 +8,54 @@ const cacheKey = 'shopEaseProducts';
 const cacheExpiryKey = 'shopEaseProductsExpiry';
 const cacheTTL = 1000 * 60 * 15; // 15 minutes
 
+// Firebase Auth State Management
+function initAuthState() {
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged((user) => {
+            updateAuthUI(user);
+        });
+    }
+}
+
+function updateAuthUI(user) {
+    const authLink = document.getElementById('auth-link');
+    const mobileAuthLink = document.getElementById('mobile-auth-link');
+
+    if (user) {
+        // User is signed in
+        const displayName = user.displayName || user.email.split('@')[0];
+        authLink.innerHTML = `
+            <div class="user-menu">
+                <span>Welcome, ${displayName}</span>
+                <button id="logout-btn" class="logout-btn">Logout</button>
+            </div>
+        `;
+        mobileAuthLink.innerHTML = `<button id="mobile-logout-btn" class="logout-btn">Logout</button>`;
+
+        // Add logout event listeners
+        document.getElementById('logout-btn').addEventListener('click', handleLogout);
+        const mobileLogout = document.getElementById('mobile-logout-btn');
+        if (mobileLogout) {
+            mobileLogout.addEventListener('click', handleLogout);
+        }
+    } else {
+        // User is signed out
+        authLink.innerHTML = '<a href="auth.html">Sign In</a>';
+        mobileAuthLink.innerHTML = '<a href="auth.html">Sign In</a>';
+    }
+}
+
+async function handleLogout() {
+    try {
+        await firebase.auth().signOut();
+        localStorage.removeItem('shopEaseUser');
+        alert('You have been logged out successfully.');
+    } catch (error) {
+        console.error('Logout error:', error);
+        alert('Error logging out. Please try again.');
+    }
+}
+
 const fallbackProducts = [
     {
         id: 1,
@@ -298,6 +346,7 @@ window.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     initializeCartNavigation();
     loadProducts();
+    initAuthState();
 });
 
 console.log('E-Commerce Website Loaded');

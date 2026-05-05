@@ -1,5 +1,5 @@
-// Auth Form Handler
-class AuthForm {
+// Firebase Authentication Handler
+class FirebaseAuthForm {
     constructor() {
         this.loginForm = document.getElementById('loginForm');
         this.signupForm = document.getElementById('signupForm');
@@ -249,39 +249,59 @@ class AuthForm {
         inputElements.forEach(el => el.classList.remove('error'));
     }
 
-    handleLoginSubmit(e) {
+    async handleLoginSubmit(e) {
         e.preventDefault();
 
-        const email = document.getElementById('loginEmail').value;
+        const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
+        const loginButton = this.loginFormElement.querySelector('button[type="submit"]');
 
         // Validate all fields
         const emailValid = this.validateEmail(email, 'loginEmailError', document.getElementById('loginEmail'));
         const passwordValid = this.validateLoginPassword(password, 'loginPasswordError', document.getElementById('loginPassword'));
 
-        if (emailValid && passwordValid) {
-            // Store in localStorage (simple persistence)
-            const user = {
-                email: email,
+        if (!emailValid || !passwordValid) {
+            return;
+        }
+
+        // Disable button and show loading state
+        loginButton.disabled = true;
+        loginButton.textContent = 'Signing in...';
+
+        try {
+            // Sign in with Firebase
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Store user info in localStorage
+            localStorage.setItem('shopEaseUser', JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || email.split('@')[0],
                 loginTime: new Date().toISOString()
-            };
-            localStorage.setItem('shopEaseUser', JSON.stringify(user));
-            
-            // Show success message (you can enhance this later with a proper notification)
+            }));
+
+            // Show success message
             alert('Welcome back! You are now signed in.');
             
             // Redirect to home page
             window.location.href = 'index.html';
+        } catch (error) {
+            // Handle Firebase errors
+            this.handleAuthError(error, 'login');
+            loginButton.disabled = false;
+            loginButton.textContent = 'Sign In';
         }
     }
 
-    handleSignupSubmit(e) {
+    async handleSignupSubmit(e) {
         e.preventDefault();
 
-        const name = document.getElementById('signupName').value;
-        const email = document.getElementById('signupEmail').value;
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
         const password = document.getElementById('signupPassword').value;
         const confirmPassword = document.getElementById('signupConfirmPassword').value;
+        const signupButton = this.signupFormElement.querySelector('button[type="submit"]');
 
         // Validate all fields
         const nameValid = this.validateName(name, 'signupNameError', document.getElementById('signupName'));
@@ -289,26 +309,107 @@ class AuthForm {
         const passwordValid = this.validateSignupPassword(password, 'signupPasswordError', document.getElementById('signupPassword'));
         const confirmPasswordValid = this.validateConfirmPassword(confirmPassword, 'signupConfirmPasswordError', document.getElementById('signupConfirmPassword'));
 
-        if (nameValid && emailValid && passwordValid && confirmPasswordValid) {
-            // Store user data in localStorage (simple persistence)
-            const user = {
-                name: name,
-                email: email,
-                password: password, // Note: In production, never store plain passwords!
+        if (!nameValid || !emailValid || !passwordValid || !confirmPasswordValid) {
+            return;
+        }
+
+        // Disable button and show loading state
+        signupButton.disabled = true;
+        signupButton.textContent = 'Creating Account...';
+
+        try {
+            // Create user with Firebase
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Update user profile with display name
+            await user.updateProfile({
+                displayName: name
+            });
+
+            // Store user data in localStorage
+            localStorage.setItem('shopEaseUser', JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                displayName: name,
                 createdAt: new Date().toISOString()
-            };
-            localStorage.setItem('shopEaseUser', JSON.stringify(user));
-            
+            }));
+
             // Show success message
             alert('Account created successfully! Welcome to ShopEase!');
             
             // Redirect to home page
             window.location.href = 'index.html';
+        } catch (error) {
+            // Handle Firebase errors
+            this.handleAuthError(error, 'signup');
+            signupButton.disabled = false;
+            signupButton.textContent = 'Create Account';
         }
+    }
+
+    handleAuthError(error, formType) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        let userMessage = 'An error occurred. Please try again.';
+        let targetErrorId = '';
+
+        // Map Firebase error codes to user-friendly messages
+        switch (errorCode) {
+            case 'auth/email-already-in-use':
+                userMessage = 'This email is already registered. Please sign in or use a different email.';
+                targetErrorId = formType === 'signup' ? 'signupEmailError' : 'loginEmailError';
+                break;
+            case 'auth/invalid-email':
+                userMessage = 'The email address is invalid. Please enter a valid email.';
+                targetErrorId = formType === 'signup' ? 'signupEmailError' : 'loginEmailError';
+                break;
+            case 'auth/weak-password':
+                userMessage = 'Your password is too weak. Please use a stronger password.';
+                targetErrorId = formType === 'signup' ? 'signupPasswordError' : 'loginPasswordError';
+                break;
+            case 'auth/user-not-found':
+                userMessage = 'No account found with this email. Please sign up first.';
+                targetErrorId = 'loginEmailError';
+                break;
+            case 'auth/wrong-password':
+                userMessage = 'Incorrect password. Please try again.';
+                targetErrorId = 'loginPasswordError';
+                break;
+            case 'auth/too-many-requests':
+                userMessage = 'Too many failed login attempts. Please try again later.';
+                targetErrorId = formType === 'signup' ? 'signupPasswordError' : 'loginPasswordError';
+                break;
+            default:
+                userMessage = errorMessage || 'An authentication error occurred.';
+        }
+
+        // Display error message
+        if (targetErrorId) {
+            const errorElement = document.getElementById(targetErrorId);
+            if (errorElement) {
+                errorElement.textContent = userMessage;
+                const inputId = targetErrorId.replace('Error', '');
+                const inputElement = document.getElementById(inputId);
+                if (inputElement) {
+                    inputElement.classList.add('error');
+                }
+            }
+        } else {
+            alert(userMessage);
+        }
+
+        console.error('Firebase Auth Error:', errorCode, errorMessage);
     }
 }
 
-// Initialize auth form when DOM is ready
+// Initialize auth form when DOM is ready and Firebase is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new AuthForm();
+    // Wait for Firebase to be initialized
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        new FirebaseAuthForm();
+    } else {
+        console.error('Firebase not loaded. Please check firebase-config.js');
+    }
 });
