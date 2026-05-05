@@ -184,6 +184,8 @@ function renderRelatedProducts(products, currentId) {
         image.src = product.image;
         image.alt = product.title;
         image.loading = 'lazy';
+        image.srcset = `${product.image.replace('300x300', '200x200')} 200w, ${product.image.replace('300x300', '300x300')} 300w, ${product.image.replace('300x300', '400x400')} 400w`;
+        image.sizes = '(max-width: 640px) 200px, (max-width: 1024px) 300px, 400px';
         link.appendChild(image);
 
         const title = document.createElement('h3');
@@ -231,7 +233,9 @@ function renderProductDetail(product, relatedProducts = []) {
 
     detailPlaceholder.innerHTML = `
         <div class="detail-image-wrapper" id="detailImageWrapper">
-            <img id="detailImage" class="detail-image" src="${product.image}" alt="${product.title}" loading="lazy" />
+            <img id="detailImage" class="detail-image" src="${product.image}" alt="${product.title}" loading="lazy" 
+                 srcset="${product.image.replace('300x300', '400x400')} 400w, ${product.image.replace('300x300', '600x600')} 600w, ${product.image.replace('300x300', '800x800')} 800w"
+                 sizes="(max-width: 640px) 400px, (max-width: 1024px) 600px, 800px" />
             <span class="zoom-hint">Hover to zoom</span>
         </div>
         <div class="detail-info">

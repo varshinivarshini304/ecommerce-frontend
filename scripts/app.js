@@ -128,6 +128,15 @@ function createProductCard(product) {
     image.src = product.image;
     image.alt = product.title;
     image.loading = 'lazy';
+    
+    // Add responsive image sources
+    image.srcset = `
+        ${product.image.replace('400x400', '300x300')} 300w,
+        ${product.image.replace('400x400', '400x400')} 400w,
+        ${product.image.replace('400x400', '600x600')} 600w
+    `;
+    image.sizes = '(max-width: 640px) 300px, (max-width: 1024px) 400px, 600px';
+    
     imageLink.appendChild(image);
     card.appendChild(imageLink);
 
