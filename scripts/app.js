@@ -124,17 +124,17 @@ function createProductCard(product) {
     imageLink.href = `product.html?id=${product.id}`;
 
     const image = document.createElement('img');
-    image.className = 'product-image';
-    image.src = product.image;
+    image.className = 'product-image lazy-img';
     image.alt = product.title;
     image.loading = 'lazy';
-    
-    // Add responsive image sources
-    image.srcset = `
+
+    // Defer actual loading: store sources in data-* attributes for the lazy loader
+    image.setAttribute('data-src', product.image);
+    image.setAttribute('data-srcset', `
         ${product.image.replace('400x400', '300x300')} 300w,
         ${product.image.replace('400x400', '400x400')} 400w,
         ${product.image.replace('400x400', '600x600')} 600w
-    `;
+    `);
     image.sizes = '(max-width: 640px) 300px, (max-width: 1024px) 400px, 600px';
     
     imageLink.appendChild(image);

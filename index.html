@@ -6,8 +6,7 @@
     <meta name="description" content="ShopEase - Your trusted online store for curated products">
     <meta name="theme-color" content="#2563eb">
     <title>E-Commerce Frontend</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Removed unused Google Fonts preconnect to reduce external requests -->
     <link rel="dns-prefetch" href="//fakestoreapi.com">
     <link rel="stylesheet" href="styles/main.min.css">
 </head>
@@ -79,12 +78,16 @@
         </section>
     </main>
 
-    <script src="scripts/app.min.js"></script>
+    <script src="scripts/lazyload.js" defer></script>
+    <script src="scripts/app.min.js" defer></script>
 
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js" defer></script>
     
     <!-- Firebase Configuration -->
-    <script src="scripts/firebase-config.js"></script>
+    <script src="scripts/firebase-config.js" defer></script>
+
+</body>
+</html>
 

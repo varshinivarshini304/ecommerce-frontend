@@ -4,9 +4,16 @@
   "description": "Responsive e-commerce website UI development starter project.",
   "main": "scripts/app.js",
   "scripts": {
-    "start": "echo \"No dev server configured. Open index.html in a browser.\""
+    "start": "echo \"No dev server configured. Open index.html in a browser.\"",
+    "images:build": "node scripts/build-images.js",
+    "build:js": "npx terser scripts/app.js -c -m -o scripts/app.min.js && npx terser scripts/product.js -c -m -o scripts/product.min.js && npx terser scripts/auth.js -c -m -o scripts/auth.min.js",
+    "build": "npm run images:build && npm run build:js"
   },
   "keywords": ["ecommerce", "frontend", "html", "css", "javascript"],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "sharp": "^0.32.0",
+    "terser": "^5.20.0"
+  }
 }

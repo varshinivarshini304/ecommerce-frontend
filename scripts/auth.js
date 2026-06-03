@@ -8,7 +8,7 @@ class FirebaseAuthForm {
         this.switchToSignup = document.getElementById('switchToSignup');
         this.switchToLogin = document.getElementById('switchToLogin');
         
-        this.init();
+        this.init();                                   
     }
 
     init() {
